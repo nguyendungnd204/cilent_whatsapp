@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Home from './pages/home/home';
+import Login from './pages/login/login';
+import Dashboard from './pages/dashboard/dashboard';
+import Header from './components/header/header';
+import Footer from './components/footer/footer';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [isAuthenticated, setIsAuthenticated] = useState(false); // Sửa lỗi chính tả
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleLogout = () => {
+        setIsAuthenticated(false);
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+    };
+
+    return (
+        <Router>
+            <Header isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route
+                    path="/login"
+                    element={<Login setIsAuthenticated={setIsAuthenticated} />} // Truyền setIsAuthenticated
+                />
+                <Route
+                    path="/dashboard"
+                    element={
+                        isAuthenticated ? (
+                            <Dashboard />
+                        ) : (
+                            <Navigate to="/login" />
+                        )
+                    }
+                />
+                <Route path="*" element={<h1>404 - Not Found</h1>} />
+            </Routes>
+            <Footer />
+        </Router>
+    );
 }
 
-export default App
+export default App;
